@@ -63,7 +63,7 @@ void CtrlBox::OnPaint( wxPaintEvent& WXUNUSED(event) )
     int h, w;
     dc.SetFont( GetFont() );
     dc.GetTextExtent( txt, &w, &h );
-    //dc.SetTextForeground( *wxBLACK );
+    dc.SetTextForeground( GetForegroundColour() );  // dark mode, don't default to black
     //dc.SetTextBackground( *wxGREEN );
     //if( w<r.width && h<r.height )
     {

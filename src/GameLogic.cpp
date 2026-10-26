@@ -45,6 +45,7 @@
 #include "CompressMoves.h"
 #include "Tabs.h"
 #include "Database.h"
+#include "DarkMode.h"
 using namespace std;
 using namespace thc;
 
@@ -3374,7 +3375,7 @@ void GameLogic::NewState( GAME_STATE new_state, bool from_mouse_move )
             bool announce = glc.TestResult( result_txt );
             if( announce )
             {
-                canvas->box->SetForegroundColour(*wxRED);
+                canvas->box->SetForegroundColour(DarkModeAlert());
                 canvas->box->SetLabel(result_txt);
                 suggestions = false;
             }
@@ -3388,7 +3389,7 @@ void GameLogic::NewState( GAME_STATE new_state, bool from_mouse_move )
         case PONDERING:
         case POPUP:
         {
-            canvas->box->SetForegroundColour(*wxRED);
+            canvas->box->SetForegroundColour(DarkModeAlert());
             canvas->box->SetLabel(reply_to.c_str());
             suggestions = false;
             b1 = "New Game";                    b1_cmd = ID_CMD_NEW_GAME;
@@ -3409,7 +3410,7 @@ void GameLogic::NewState( GAME_STATE new_state, bool from_mouse_move )
         case FAKE_BOOK_DELAY:
         case THINKING:
         {
-            canvas->box->SetForegroundColour(*wxBLACK);
+            canvas->box->SetForegroundColour(DarkModeFg());
             canvas->box->SetLabel("Engine thinking...");
             suggestions = false;
             b1 = "New Game";                    b1_cmd = ID_CMD_NEW_GAME;
@@ -3424,7 +3425,7 @@ void GameLogic::NewState( GAME_STATE new_state, bool from_mouse_move )
     //    canvas->SetChessPosition( gd.master_position );
     if( suggestions )
     {
-        canvas->box->SetForegroundColour(*wxBLACK);
+        canvas->box->SetForegroundColour(DarkModeFg());
         canvas->box->SetLabel( b1 && b2 && b3 && b4 ? "Enter moves, comments and variations freely - or ..." : "Start" );
     }
     if( title && !show )

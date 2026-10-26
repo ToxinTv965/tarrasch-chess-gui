@@ -10,6 +10,7 @@
 #include "Repository.h"
 #include "Objects.h"
 #include "PanelBoard.h"
+#include "DarkMode.h"
 
 //-----------------------------------------------------------------------------
 // Event table
@@ -351,7 +352,7 @@ void PanelBoard::RedrawClocks()
         {
             time_bottom_txt = temp;
             time_bottom_red = temp_red;
-            time_bottom->SetForegroundColour( temp_red ? *wxRED : *wxBLACK );
+            time_bottom->SetForegroundColour( temp_red ? DarkModeAlert() : DarkModeFg() );
             time_bottom->SetLabel( time_bottom_txt.c_str() );
         }
         std::string temp2(black_clock_visible ? black_clock_txt.c_str() : "");
@@ -360,7 +361,7 @@ void PanelBoard::RedrawClocks()
         {
             time_top_txt = temp2;
             time_top_red = temp_red2;
-            time_top->SetForegroundColour( temp_red2 ? *wxRED : *wxBLACK );
+            time_top->SetForegroundColour( temp_red2 ? DarkModeAlert() : DarkModeFg() );
             time_top->SetLabel( time_top_txt.c_str() );
         }
     }
@@ -372,7 +373,7 @@ void PanelBoard::RedrawClocks()
         {
             time_bottom_txt = temp;
             time_bottom_red = temp_red;
-            time_bottom->SetForegroundColour( temp_red ? *wxRED : *wxBLACK );
+            time_bottom->SetForegroundColour( temp_red ? DarkModeAlert() : DarkModeFg() );
             time_bottom->SetLabel( time_bottom_txt.c_str() );
         }
         std::string temp2(white_clock_visible ? white_clock_txt.c_str() : "");
@@ -381,7 +382,7 @@ void PanelBoard::RedrawClocks()
         {
             time_top_txt = temp2;
             time_top_red = temp_red2;
-            time_top->SetForegroundColour( temp_red2 ? *wxRED : *wxBLACK );
+            time_top->SetForegroundColour( temp_red2 ? DarkModeAlert() : DarkModeFg() );
             time_top->SetLabel( time_top_txt.c_str() );
         }
     }

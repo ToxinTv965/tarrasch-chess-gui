@@ -1,0 +1,236 @@
+[Event "White Repertoire 01: 1...e5 - Evans Gambit"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "1"]
+[White "Repertoire (White)"]
+[Black "Italian: 3...Bc5 4.b4!"]
+[Result "*"]
+
+{The Evans Gambit: give a pawn, build a big centre with c3+d4 and attack the
+black king before it castles. Key ideas: Ba3 stops Black castling, Qb3 hits
+f7, e4-e5 kicks the f6 knight.}
+1.e4 e5 2.Nf3 Nc6 3.Bc4 Bc5 4.b4 Bxb4
+(4...Bb6 {Evans declined.} 5.a4 a6 6.Nc3 Nf6 7.Nd5 {Trade the b6 bishop or
+gain space on the queenside. White has a free initiative.})
+5.c3 Ba5
+(5...Be7 6.d4 Na5 7.Be2 exd4 8.Qxd4 Nf6 9.e5 Nc6 10.Qh4 Nd5 11.Qg3 g6 12.O-O
+{Lead in development and attacking chances on the dark squares (Bh6).})
+(5...Bc5 6.d4 exd4 7.O-O d6 8.cxd4 Bb6 9.Nc3 {Classic Evans centre. Ideas:
+Bb2, Re1, e5, Nd5.})
+6.d4 exd4
+(6...d6 7.Qb3 Qd7 8.dxe5 Bb6 9.Nbd2 Na5 10.Qc2 {Nice centre and quick
+development, Black's king is not safe yet.})
+7.O-O
+(7.Qb3 {is a sharper alternative, hitting f7 at once.})
+7...Nge7
+(7...dxc3 {The Compromised Defence - greedy and dangerous for Black.}
+8.Qb3 Qf6 9.e5 Qg6 10.Nxc3 Nge7 11.Ba3 {Black's king is stuck in the centre.
+Bring rooks to d1/e1 and open the position. Practical chances are huge.})
+8.cxd4 d5 9.exd5 Nxd5 10.Ba3
+{Black cannot castle (Ba3 covers f8). Follow up with Qb3, Bb5, Re1, Nbd2.} *
+
+[Event "White Repertoire 02: 1...e5 - Two Knights 4.Ng5"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "2"]
+[White "Repertoire (White)"]
+[Black "Two Knights: 3...Nf6 4.Ng5"]
+[Result "*"]
+
+{4.Ng5 attacks f7 straight away. Many club players don't know the theory and
+lose quickly. Also, the Traxler (4...Bc5) is handled here.}
+1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5
+(4...Bc5 {The Traxler: wild, but 5.Bxf7+ keeps it simple.} 5.Bxf7+ Ke7 6.Bb3
+Rf8 7.O-O d6 8.c3 {White is a clean pawn up and Black's king is misplaced.})
+5.exd5 Na5
+(5...Nxd5 {A big mistake at club level.} 6.Nxf7
+{The Fried Liver Attack! (6.d4! is objectively even stronger.)} 6...Kxf7
+7.Qf3+ Ke6 8.Nc3 Ncb4 9.Qe4 c6 10.a3 Na6 11.d4 Nac7 12.O-O
+{Black's king is in the middle of the board, attack with Bf4, Rae1, f4-f5.})
+(5...Nd4 {Fritz Variation.} 6.c3 b5 7.Bf1 Nxd5 8.cxd4 Qxg5 9.Bxb5+ Kd8 10.Qf3
+{Black's king is exposed, White is better.})
+(5...b5 {Ulvestad Variation.} 6.Bf1 h6 7.Nxf7 Kxf7 8.dxc6 {A pawn up with
+Black's king displaced.})
+6.Bb5+ c6 7.dxc6 bxc6 8.Be2 h6 9.Nf3 e4 10.Ne5 Bd6
+(10...Qc7 11.d4 exd3 12.Nxd3 {Same idea: White keeps the extra pawn.})
+11.d4 exd3 12.Nxd3 Qc7 13.h3 O-O 14.O-O
+{White keeps the extra pawn. Black has activity, so consolidate with Nc3, Bf3
+and Re1 before going for more.} *
+
+[Event "White Repertoire 03: 1...e5 - Other defences"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "3"]
+[White "Repertoire (White)"]
+[Black "Petroff, Philidor, Hungarian, gambits"]
+[Result "*"]
+
+1.e4 e5 2.Nf3 Nf6
+{Petroff. 5.Nc3 and castling queenside gives an aggressive opposite-castling
+fight.}
+(2...d6 {Philidor.} 3.d4 exd4
+(3...Nf6 4.Nc3 Nbd7 5.Bc4 Be7 6.O-O O-O 7.Re1 c6 8.a4 {Space and easy
+development, watch for Bxf7+ tricks.})
+4.Nxd4 Nf6 5.Nc3 Be7 6.Bf4 O-O 7.Qd2 {Then O-O-O and push the kingside
+pawns.})
+(2...Nc6 3.Bc4 Be7 {Hungarian Defence.} 4.d4 d6 5.d5 Nb8 6.Bd3 {More space.})
+(2...f5 {Latvian Gambit.} 3.Nxe5 Qf6 4.d4 d6 5.Nc4 fxe4 6.Nc3 Qg6 7.f3
+{Open the position, Black's king is weak.})
+(2...d5 {Elephant Gambit.} 3.exd5 e4 4.Qe2 Nf6 5.d3 {White is a pawn up.})
+3.Nxe5 d6
+(3...Nxe4 {A typical club mistake.} 4.Qe2 Qe7
+(4...Nf6 $4 5.Nc6+ {Discovered check wins the queen!})
+5.Qxe4 d6 6.d4 dxe5 7.dxe5 {White is a pawn up.})
+4.Nf3 Nxe4 5.Nc3 Nxc3 6.dxc3 Be7 7.Be3 Nc6 8.Qd2 Be6 9.O-O-O Qd7
+{Opposite sides castling. Push h4-h5 and g4, Black's king will be the target.}
+*
+
+[Event "White Repertoire 04: Sicilian - Smith-Morra Gambit"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "4"]
+[White "Repertoire (White)"]
+[Black "1...c5 2.d4 cxd4 3.c3"]
+[Result "*"]
+
+{The Smith-Morra Gambit avoids learning huge Open Sicilian theory and gives you
+fast development, open lines (c- and d-files) and lots of traps. Typical setup:
+Nc3, Nf3, Bc4, O-O, Qe2, Rd1, then e5 or Nd5/Nb5 tactics.}
+1.e4 c5 2.d4 cxd4 3.c3 dxc3
+(3...Nf6 {Declining - it becomes an Alapin.} 4.e5 Nd5 5.cxd4 d6 6.Nf3 Nc6
+7.Bc4 Nb6 8.Bb5 {Fine for White, simple development.})
+(3...d5 4.exd5 Qxd5 5.cxd4 Nc6 6.Nf3 Bg4 7.Nc3 Qd6 8.d5 {Space and
+initiative.})
+(3...d3 4.Bxd3 Nc6 5.Nf3 {Black declined the pawn, White just develops
+quickly.})
+4.Nxc3 Nc6
+(4...d6 5.Nf3 e6 6.Bc4 a6 7.O-O Nf6 8.Qe2 Be7 9.Rd1 {Standard Morra
+pressure: e4-e5 or Nd4-f5 ideas.})
+5.Nf3 d6
+(5...e6 6.Bc4 Qc7 7.O-O Nf6 8.Qe2 Ng4
+{The Siberian Trap! Be very careful here.}
+9.Nb5
+(9.h3 $4 Nd4 10.Nxd4 Qh2# {Don't fall for this!})
+9...Qb8 10.h3 {Now h3 is safe and the knight on g4 has to go back.})
+6.Bc4 e6
+(6...Nf6 $6 7.e5 Nxe5
+(7...dxe5 8.Qxd8+ Nxd8 9.Nb5 {Big pressure on c7.})
+8.Nxe5 dxe5 9.Bxf7+ Kxf7 10.Qxd8 {White wins the queen.})
+7.O-O Nf6 8.Qe2 Be7 9.Rd1 e5
+(9...Qc7 10.Nb5 Qb8 11.e5 {Open lines against the black king.})
+10.h3 O-O 11.Be3 Be6 12.Rac1
+{All the pieces are developed and active. Plans: Nd5, Bxe6, Bb5 and pressure on
+d6. Full compensation for the pawn.} *
+
+[Event "White Repertoire 05: French - Advance + Milner-Barry"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "5"]
+[White "Repertoire (White)"]
+[Black "1...e6 2.d4 d5 3.e5"]
+[Result "*"]
+
+{The Advance gains space and cramps Black. Against the main ...Qb6 setup we play
+the Milner-Barry Gambit: sacrifice d4 for a fierce attack.}
+1.e4 e6 2.d4 d5 3.e5 c5 4.c3 Nc6
+(4...Qb6 5.Nf3 Bd7 6.a3 {Prepare b4 and gain space on the queenside.})
+5.Nf3 Qb6
+(5...Bd7 6.Be2 Nge7 7.Na3 cxd4 8.cxd4 Nf5 9.Nc2 {Solid space advantage; the
+c2 knight protects d4.})
+6.Bd3 cxd4 7.cxd4 Bd7 8.O-O
+{The Milner-Barry Gambit.}
+8...Nxd4 9.Nxd4 Qxd4 10.Nc3 Qxe5
+(10...a6 11.Qe2 Ne7 12.Kh1 Nc6 13.f4 {White's pieces swarm the kingside.})
+11.Re1 Qb8 12.Nxd5 Bd6 13.Qg4 Kf8 14.Bd2
+{Two pawns down, but a raging attack: Bc3, Rac1, Qh4, and Black's king can't
+castle. Great practical chances!} *
+
+[Event "White Repertoire 06: Caro-Kann - Fantasy 3.f3"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "6"]
+[White "Repertoire (White)"]
+[Black "1...c6 2.d4 d5 3.f3"]
+[Result "*"]
+
+{The Fantasy Variation gives the solid Caro-Kann a sharp twist. White wants a
+big centre (e4+d4) and open f-file, Bc4 aims at f7.}
+1.e4 c6 2.d4 d5 3.f3 dxe4
+(3...e6 4.Nc3 Bb4 5.a3 Bxc3+ 6.bxc3 dxe4 7.fxe4 e5 8.Nf3 {The bishop pair and
+open lines.})
+(3...g6 4.c3 Bg7 5.Be3 {Solid: keep the e4-d4 centre.})
+4.fxe4 e5 5.Nf3 exd4 6.Bc4 Nf6
+(6...Bb4+ 7.c3 {Gambit play, development and f7 pressure.})
+7.O-O Be7 8.e5 Nd5 9.Bxd5 cxd5 10.Qxd4
+{Black's king is still in the centre and the f-file is open.} *
+
+[Event "White Repertoire 07: Scandinavian - 3.Nc3"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "7"]
+[White "Repertoire (White)"]
+[Black "1...d5 2.exd5"]
+[Result "*"]
+
+{Develop with tempo by hitting the black queen, then castle long and attack.}
+1.e4 d5 2.exd5 Qxd5
+(2...Nf6 3.d4 Nxd5
+(3...Bg4 {Portuguese Gambit.} 4.f3 Bf5 5.Bb5+ Nbd7 6.c4 {Keep the pawn.})
+4.c4 Nb6 5.Nf3 g6 6.Nc3 {Big centre.})
+3.Nc3 Qa5
+(3...Qd6 4.d4 Nf6 5.Nf3 a6 6.g3 {Bf4 next with tempo on the queen.})
+(3...Qd8 4.d4 Nf6 5.Nf3 Bg4 6.h3 Bxf3 7.Qxf3 c6 8.Be3 {Bishop pair, then
+O-O-O.})
+4.d4 Nf6 5.Nf3 c6 6.Bc4 Bf5 7.Bd2 e6 8.Qe2 Bb4 9.O-O-O Nbd7 10.a3
+{Watch for Nd5! tricks against the queen on a5. Plans: d4-d5, Ne5, g4.} *
+
+[Event "White Repertoire 08: Pirc/Modern - 150 Attack"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "8"]
+[White "Repertoire (White)"]
+[Black "1...d6 / 1...g6"]
+[Result "*"]
+
+{The 150 Attack: Be3, Qd2, f3, Bh6 to trade the dark bishop, then h4-h5 and mate
+on the h-file. Easy to learn, very dangerous. 1...g6 2.d4 Bg7 3.Nc3 d6 4.Be3
+leads to the same thing.}
+1.e4 d6 2.d4 Nf6 3.Nc3 g6 4.Be3 Bg7
+(4...c6 5.Qd2 b5 6.f3 Nbd7 7.g4 {Kingside pawn storm.})
+5.Qd2 c6
+(5...O-O 6.O-O-O c6 7.Bh6 b5 8.Bxg7 Kxg7 9.h4 {Open the h-file - classic
+attack.})
+6.f3 b5 7.Nge2 Nbd7 8.Bh6 Bxh6 9.Qxh6 Bb7 10.a3 e5 11.g3 Qe7 12.Bg2
+{Black's king has no safe home; keep him in the centre with Qh6 and play for
+d4-d5 or O-O-O and h4.} *
+
+[Event "White Repertoire 09: Alekhine - Modern 4.Nf3"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "9"]
+[White "Repertoire (White)"]
+[Black "1...Nf6 2.e5"]
+[Result "*"]
+
+1.e4 Nf6 2.e5 Nd5 3.d4 d6 4.Nf3 Bg4
+(4...g6 5.Bc4 Nb6 6.Bb3 Bg7 7.Ng5 {Tactics on f7 and e6.} 7...e6 8.Qf3 Qe7
+9.Ne4 {Strong pressure.})
+(4...dxe5 5.Nxe5 {Central knight, comfortable for White.})
+5.Be2 e6 6.O-O Be7 7.h3 Bh5 8.c4 Nb6 9.Nc3 O-O 10.Be3 d5 11.c5 Bxf3 12.Bxf3
+Nc4 13.b3
+{Space and the bishop pair; follow up with Bf4, Rc1 and queenside expansion.} *
+
+[Event "White Repertoire 10: Rare replies"]
+[Site "Tarrasch"]
+[Date "2026.10.14"]
+[Round "10"]
+[White "Repertoire (White)"]
+[Black "1...Nc6, 1...b6, 1...a6"]
+[Result "*"]
+
+{Against offbeat moves: build the ideal centre (e4+d4), develop quickly, and
+punish slow play.}
+1.e4 Nc6
+(1...b6 2.d4 Bb7 3.Bd3 e6 4.Nf3 {Big centre, Bd3 shields e4.})
+(1...a6 2.d4 b5 3.Nf3 Bb7 4.Bd3 {Same idea.})
+2.Nf3 d6 3.d4 Nf6 4.Nc3 Bg4 5.Be3 {Then Qd2 and O-O-O.} *

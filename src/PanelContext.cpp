@@ -26,6 +26,7 @@
 #include "Tabs.h"
 #include "Repository.h"
 #include "Objects.h"
+#include "DarkMode.h"
 
 //temp
 bool view_flags_book_moves;
@@ -35,7 +36,7 @@ bool view_flags_book_moves;
 //-----------------------------------------------------------------------------
 BEGIN_EVENT_TABLE(PanelContext, wxWindow)//Panel)
     EVT_SIZE( PanelContext::OnSize )
-    EVT_NOTEBOOK_PAGE_CHANGED( wxID_ANY, PanelContext::OnTabSelected)   //user selects Suggestion or Engine Analysis
+    EVT_AUINOTEBOOK_PAGE_CHANGED( wxID_ANY, PanelContext::OnTabSelected)   //user selects Suggestion or Engine Analysis
     EVT_BUTTON(ID_BUTTON1,PanelContext::OnButton1)
     EVT_BUTTON(ID_BUTTON2,PanelContext::OnButton2)
     EVT_BUTTON(ID_BUTTON3,PanelContext::OnButton3)
@@ -94,10 +95,10 @@ PanelContext::PanelContext
     pb = pb_;
     lb = lb_;
 
-    context_notebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize );
-    wxColour icon_light(255,226,179);
+    context_notebook = new wxAuiNotebook(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TOP );
+    context_notebook->SetArtProvider( DarkModeNewTabArt() );
     suggestions_page = new wxPanel(context_notebook, wxID_ANY, wxPoint(0,0), wxSize((90*siz.x)/100,(90*siz.y)/100), wxNO_BORDER );
-    /*suggestions_page->*/SetBackgroundColour(icon_light);
+    /*suggestions_page->*/SetBackgroundColour(DarkModeBg());
     kibitz_page      = new wxPanel(context_notebook, wxID_ANY, wxPoint(0,0), wxSize((90*siz.x)/100,(90*siz.y)/100), wxNO_BORDER );
 
     // Add pages to notebook
@@ -121,9 +122,9 @@ PanelContext::PanelContext
     font_book = new wxFont( 10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD,   false );
     extern CtrlBoxBookMoves *gbl_book_moves;
     book_moves = gbl_book_moves;
-    book_moves->SetBackgroundColour( *wxGREEN );
+    book_moves->SetBackgroundColour( DarkModeBookBg() );
     book_moves->SetBackgroundStyle( wxBG_STYLE_COLOUR );
-    book_moves->SetForegroundColour( *wxBLACK );
+    book_moves->SetForegroundColour( DarkModeFg() );
     book_moves->SetFont( *font_book );
     book_moves->SetTxt("no book moves",false);
 
@@ -190,7 +191,7 @@ void PanelContext::ClearStaleKibitz()
     kibitz_button2->Show(false);
 }
 
-void PanelContext::OnTabSelected( wxBookCtrlEvent& event )
+void PanelContext::OnTabSelected( wxAuiNotebookEvent& event )
 {
     int idx = event.GetSelection();
     bool kibitz_selected = (idx==1);
@@ -629,6 +630,7 @@ void PanelContext::AuiBegin( wxFrame *frame, wxWindow *top, wxWindow *left, wxWi
     // notify wxAUI which frame to use
     m_mgr.SetManagedWindow(frame);
     m_mgr.SetDockSizeConstraint(0.9,0.9);
+    DarkModeAuiManager(m_mgr);
 
     // add the panes to the manager Note: Experience shows there is no point trying to change a panel's fundamental characteristics
     //  after adding it to the manager - Things like CaptionVisible(false) etc need to be intantiated with the panel

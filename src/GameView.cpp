@@ -12,6 +12,7 @@
 #include "Repository.h"
 #include "DebugPrintf.h"
 #include "GameView.h"
+#include "DarkMode.h"
 using namespace std;
 using namespace thc;
 
@@ -403,8 +404,8 @@ void GameView::Display( unsigned long pos )
                 {
                     if( gve.type != PRE_COMMENT )
                         c_str = gve.node->game_move.comment.c_str();
-                    ctrl->BeginTextColour(wxColour(0, 0, 255));
-                    gv_printf( "ctrl->BeginTextColour(wxColour(0, 0, 255));" );
+                    ctrl->BeginTextColour(DarkModeComment());
+                    gv_printf( "ctrl->BeginTextColour(DarkModeComment());" );
                     if( i )
                     {
                         ctrl->WriteText( " " );

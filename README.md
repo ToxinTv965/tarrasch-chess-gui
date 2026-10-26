@@ -1,3 +1,61 @@
+Tarrasch Dark Mode (fork)
+=========================
+
+This is a fork of [Bill Forster's Tarrasch Chess GUI](https://github.com/billforsternz/tarrasch-chess-gui)
+with two additions:
+
+- **Permanent dark mode.** Every window and dialog uses a dark theme, including the move list,
+  menu bar, notebook tab strips, panel dividers, popups and (on Windows 10/11) the title bar,
+  scrollbars and buttons. The colour palette lives in `src/DarkMode.h`.
+- **An opening repertoire** in `install/repertoire/`, as PGN files with variations and comments:
+  a tactical 1.e4 repertoire for White (Evans Gambit, Two Knights 4.Ng5, Smith-Morra, Advance
+  French with the Milner-Barry Gambit, Fantasy Caro-Kann, 150 Attack and more) and a Sicilian
+  Dragon repertoire for Black, including the main anti-Sicilians. Open them with File > Open. They
+  are written for club players, not checked against an engine, so treat them as a starting point.
+
+Everything else is the original Tarrasch; all credit for the program goes to its author.
+
+Download
+--------
+
+See the [Releases](../../releases) page for a ready-to-run Windows build. Unzip it anywhere you can
+write to and run `Tarrasch.exe`. Keep the empty `Tarrasch.ini` next to the exe: without it, Tarrasch
+looks for its files in `Documents\<folder name>` and won't find the opening book.
+
+No game database or chess engine is included. For an engine, download one (e.g. Stockfish) and
+select it under Options > Engine.
+
+Building (Windows, Visual Studio 2022)
+--------------------------------------
+
+The dark tab strips use `wxBitmapBundle`, so this fork needs **wxWidgets 3.1.6 or later**
+(tested with 3.1.7); the prebuilt 3.1.2 package mentioned below won't compile it.
+
+1. Download the wxWidgets 3.1.7 source and build static, release, 32 bit libraries from a
+   "x86 Native Tools Command Prompt for VS 2022":
+
+       cd wxWidgets-3.1.7\build\msw
+       nmake -f makefile.vc BUILD=release SHARED=0 UNICODE=1 RUNTIME_LIBS=static
+
+2. Copy its `include` folder and `lib\vc_lib` folder into a `wxWidgets` folder at the top of this
+   repository (`wxWidgets\include`, `wxWidgets\lib\vc_lib`). The project's include path names
+   `lib\vc_lib\mswud`, so also copy `lib\vc_lib\mswu` to `lib\vc_lib\mswud`.
+3. Open `TarraschVS2019.vcxproj` and build **Release | Win32**. The exe lands in `vc_mswu\`.
+   (Debug needs debug wxWidgets libraries too: build again with `BUILD=debug`.)
+
+Building a game database
+------------------------
+
+Tarrasch's databases (`.tdb`) are built from PGN files with `pgn2tdb` (in `pgn2tdb/`). For example,
+from [Lumbra's Gigabase](https://lumbrasgigabase.com/en/download-in-pgn-format-en/) "OTB Complete",
+this keeps games where both players are rated 2200+, plus unrated games from before 1990:
+
+    pgn2tdb -u1990 -b2200 LumbrasGigabase_OTB_Complete.pgn masters-2200.tdb
+
+Put `-u1990` before `-b2200`: the `-u` option also overwrites the rating cutoff. To build the x64
+configuration with VS2022, define `_CRT_SECURE_NO_WARNINGS` (e.g. `set CL=/D_CRT_SECURE_NO_WARNINGS`).
+Then select the database in Tarrasch with Database > Select current database.
+
 Background
 ==========
 

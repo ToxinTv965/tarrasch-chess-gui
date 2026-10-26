@@ -43,7 +43,7 @@ public:
     void SetKibitzPage();
     void SetKibitzButtons( bool kibitz_ );
     void ClearStaleKibitz();
-    void OnTabSelected( wxBookCtrlEvent &event );
+    void OnTabSelected( wxAuiNotebookEvent &event );
     void OnButton1( wxCommandEvent &event );
     void OnButton2( wxCommandEvent &event );
     void OnButton3( wxCommandEvent &event );
@@ -65,7 +65,7 @@ public:
     PopupControl    *popup;
     wxPanel         *suggestions_page;
     wxPanel         *kibitz_page;
-    wxNotebook      *context_notebook;
+    wxAuiNotebook   *context_notebook;  // (a wxAuiNotebook rather than a wxNotebook so its tabs can be dark)
     wxStaticBox     *box;
     wxStaticText    *kibitz0;
     wxStaticText    *kibitz1;

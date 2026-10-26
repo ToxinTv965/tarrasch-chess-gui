@@ -14,6 +14,7 @@
 #include "Repository.h"
 #include "GameDocument.h"
 #include "CtrlChessTxt.h"
+#include "DarkMode.h"
 
 // Create a custom event
 BEGIN_DECLARE_EVENT_TYPES()
@@ -44,6 +45,7 @@ CtrlChessTxt::CtrlChessTxt
     wxFont temp(*wxNORMAL_FONT);
     font = temp;
     SetFontSize();
+    DarkModeApply(this,false);
 }
 
 void CtrlChessTxt::SetFontSize()

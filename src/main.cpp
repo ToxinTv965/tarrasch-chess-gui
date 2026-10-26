@@ -27,6 +27,8 @@
 #include "wx/snglinst.h"
 #include "wx/ipc.h"
 #include "wx/aui/aui.h"
+#include "wx/treectrl.h"
+#include "wx/richtext/richtextctrl.h"
 #ifdef AUI_NOTEBOOK
 #include "wx/aui/auibook.h"
 #else
@@ -59,6 +61,7 @@
 #include "CtrlBoxBookMoves.h"
 #include "CtrlChessTxt.h"
 #include "DialogDetect.h"
+#include "DarkMode.h"
 
 // For Windows Tarrasch4Squares.ico is included in Tarrasch.exe as a resource, for Unix a different system is required
 #ifdef THC_UNIX
@@ -429,11 +432,357 @@ public:
 // application class
 // ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+// permanent dark mode
+// ----------------------------------------------------------------------------
+
+#ifdef THC_WINDOWS
+// Dark title bars, scrollbars, buttons and popup menus need Windows 10+ API calls. They
+//  are looked up at runtime so the program still starts on older versions of Windows
+static HMODULE DarkModeLoadSystemDll( const wchar_t *name )
+{
+    HMODULE dll = GetModuleHandleW(name);
+    return dll ? dll : LoadLibraryW(name);
+}
+
+static void DarkModeWindowsInit()
+{
+    HMODULE uxtheme = DarkModeLoadSystemDll(L"uxtheme.dll");
+    if( uxtheme )
+    {
+        // Undocumented, ordinal 135 is SetPreferredAppMode() (AllowDarkModeForApp() on 1809),
+        //  136 is FlushMenuThemes(). Together they give dark popup/context menus
+        typedef int  (WINAPI *SetPreferredAppModeFn)( int mode );
+        typedef void (WINAPI *FlushMenuThemesFn)();
+        SetPreferredAppModeFn set_preferred_app_mode = (SetPreferredAppModeFn)GetProcAddress( uxtheme, MAKEINTRESOURCEA(135) );
+        FlushMenuThemesFn     flush_menu_themes      = (FlushMenuThemesFn)    GetProcAddress( uxtheme, MAKEINTRESOURCEA(136) );
+        if( set_preferred_app_mode )
+            set_preferred_app_mode(2);  // 2 = ForceDark
+        if( flush_menu_themes )
+            flush_menu_themes();
+    }
+}
+
+static void DarkModeTitleBar( HWND hwnd )
+{
+    typedef HRESULT (WINAPI *DwmSetWindowAttributeFn)( HWND hwnd, DWORD attr, LPCVOID val, DWORD size );
+    static DwmSetWindowAttributeFn dwm_set_window_attribute =
+        (DwmSetWindowAttributeFn)GetProcAddress( DarkModeLoadSystemDll(L"dwmapi.dll"), "DwmSetWindowAttribute" );
+    if( dwm_set_window_attribute )
+    {
+        BOOL dark = TRUE;
+        if( FAILED( dwm_set_window_attribute(hwnd,20,&dark,sizeof(dark)) ) )  // DWMWA_USE_IMMERSIVE_DARK_MODE
+            dwm_set_window_attribute(hwnd,19,&dark,sizeof(dark));              // same thing, before Win10 20H1
+    }
+}
+
+static void DarkModeControlTheme( HWND hwnd )
+{
+    typedef HRESULT (WINAPI *SetWindowThemeFn)( HWND hwnd, LPCWSTR app_name, LPCWSTR id_list );
+    static SetWindowThemeFn set_window_theme =
+        (SetWindowThemeFn)GetProcAddress( DarkModeLoadSystemDll(L"uxtheme.dll"), "SetWindowTheme" );
+    if( set_window_theme )
+        set_window_theme( hwnd, L"DarkMode_Explorer", NULL );   // dark scrollbars, buttons etc.
+}
+#endif
+
+void DarkModeApply( wxWindow *win, bool recursive )
+{
+    if( !win || win->IsBeingDeleted() )
+        return;
+    wxRichTextCtrl *rich = wxDynamicCast(win,wxRichTextCtrl);
+    wxListCtrl     *list = wxDynamicCast(win,wxListCtrl);
+    bool input = rich || list
+              || wxDynamicCast(win,wxTextCtrl)
+              || wxDynamicCast(win,wxListBox)
+              || wxDynamicCast(win,wxTreeCtrl)
+              || wxDynamicCast(win,wxComboBox);
+
+    // Windows whose colours have been explicitly set by the app keep them. Exception:
+    //  wxRichTextCtrl::Create() itself explicitly sets a (white) system colour
+    if( rich )
+    {
+        win->SetBackgroundColour( DarkModeInputBg() );
+        win->SetForegroundColour( DarkModeFg() );
+    }
+    else if( !win->UseBgCol() )
+        win->SetBackgroundColour( input ? DarkModeInputBg() : DarkModeBg() );
+    if( !win->UseForegroundColour() )
+        win->SetForegroundColour( DarkModeFg() );
+    if( list )
+        list->SetTextColour( DarkModeFg() );
+    if( rich )
+    {
+        wxRichTextAttr attr = rich->GetBasicStyle();
+        if( attr.GetTextColour() != DarkModeFg() || attr.GetBackgroundColour() != DarkModeInputBg() )
+        {
+            attr.SetTextColour( DarkModeFg() );
+            attr.SetBackgroundColour( DarkModeInputBg() );  // the buffer paints this over the window background
+            rich->SetBasicStyle( attr );
+        }
+    }
+
+    #ifdef THC_WINDOWS
+    if( win->IsTopLevel() )
+        DarkModeTitleBar( (HWND)win->GetHandle() );
+    else if( input || wxDynamicCast(win,wxButton) || win->HasFlag(wxVSCROLL) || win->HasFlag(wxHSCROLL) )
+        DarkModeControlTheme( (HWND)win->GetHandle() );
+    #endif
+
+    if( recursive )
+    {
+        wxWindowList &children = win->GetChildren();
+        for( wxWindowList::iterator it = children.begin(); it != children.end(); ++it )
+            DarkModeApply( *it, true );
+    }
+}
+
+// Small light coloured glyphs for the tab strip buttons (stock ones are black)
+enum DarkModeGlyph { GLYPH_CLOSE, GLYPH_LEFT, GLYPH_RIGHT, GLYPH_LIST };
+static wxBitmap DarkModeGlyphBitmap( DarkModeGlyph glyph, const wxColour &colour )
+{
+    const wxColour mask_colour(255,0,255);
+    wxBitmap bmp(16,16,24);
+    {
+        wxMemoryDC dc(bmp);
+        dc.SetBackground( wxBrush(mask_colour) );
+        dc.Clear();
+        dc.SetPen( wxPen(colour) );
+        dc.SetBrush( wxBrush(colour) );
+        switch( glyph )
+        {
+            case GLYPH_CLOSE:
+            {
+                for( int i=0; i<2; i++ )    // two pixels thick
+                {
+                    dc.DrawLine( 4+i, 4, 12+i, 12 );
+                    dc.DrawLine( 11+i, 4, 3+i, 12 );
+                }
+                break;
+            }
+            case GLYPH_LEFT:  { wxPoint p[3] = { wxPoint(10,4), wxPoint(10,12), wxPoint(6,8)  }; dc.DrawPolygon(3,p); break; }
+            case GLYPH_RIGHT: { wxPoint p[3] = { wxPoint(6,4),  wxPoint(6,12),  wxPoint(10,8) }; dc.DrawPolygon(3,p); break; }
+            case GLYPH_LIST:  { wxPoint p[3] = { wxPoint(4,6),  wxPoint(12,6),  wxPoint(8,10) }; dc.DrawPolygon(3,p); break; }
+        }
+    }
+    bmp.SetMask( new wxMask(bmp,mask_colour) );
+    return bmp;
+}
+
+// Flat dark tab strip for wxAuiNotebook
+class DarkModeTabArt : public wxAuiGenericTabArt
+{
+public:
+    DarkModeTabArt()
+    {
+        SetColour( DarkModeBg() );
+        SetActiveColour( DarkModeTabActive() );
+        m_activeCloseBmp         = DarkModeGlyphBitmap( GLYPH_CLOSE, DarkModeFg() );
+        m_disabledCloseBmp       = DarkModeGlyphBitmap( GLYPH_CLOSE, DarkModeFgDim() );
+        m_activeLeftBmp          = DarkModeGlyphBitmap( GLYPH_LEFT,  DarkModeFg() );
+        m_disabledLeftBmp        = DarkModeGlyphBitmap( GLYPH_LEFT,  DarkModeBorder() );
+        m_activeRightBmp         = DarkModeGlyphBitmap( GLYPH_RIGHT, DarkModeFg() );
+        m_disabledRightBmp       = DarkModeGlyphBitmap( GLYPH_RIGHT, DarkModeBorder() );
+        m_activeWindowListBmp    = DarkModeGlyphBitmap( GLYPH_LIST,  DarkModeFg() );
+        m_disabledWindowListBmp  = DarkModeGlyphBitmap( GLYPH_LIST,  DarkModeBorder() );
+    }
+
+    virtual wxAuiTabArt *Clone() wxOVERRIDE
+    {
+        return new DarkModeTabArt(*this);
+    }
+
+    virtual void DrawBackground( wxDC &dc, wxWindow *WXUNUSED(wnd), const wxRect &rect ) wxOVERRIDE
+    {
+        dc.SetPen( *wxTRANSPARENT_PEN );
+        dc.SetBrush( wxBrush(DarkModeBg()) );
+        dc.DrawRectangle( rect.x-1, rect.y-1, rect.width+3, rect.height+2 );
+        dc.SetPen( wxPen(DarkModeBorder()) );   // base line under the tabs
+        dc.DrawLine( rect.x, rect.y+rect.height-1, rect.x+rect.width+2, rect.y+rect.height-1 );
+    }
+
+    virtual void DrawTab( wxDC &dc, wxWindow *wnd, const wxAuiNotebookPage &page, const wxRect &in_rect,
+                          int close_button_state, wxRect *out_tab_rect, wxRect *out_button_rect, int *x_extent ) wxOVERRIDE
+    {
+        wxSize tab_size = GetTabSize( dc, wnd, page.caption, page.bitmap, page.active, close_button_state, x_extent );
+        int tab_height = m_tabCtrlHeight - 3;
+        int tab_width  = tab_size.x;
+        int tab_x = in_rect.x;
+        int tab_y = in_rect.y + in_rect.height - tab_height;
+        int clip_width = tab_width;
+        if( tab_x + clip_width > in_rect.x + in_rect.width )
+            clip_width = (in_rect.x + in_rect.width) - tab_x;
+        dc.SetClippingRegion( tab_x, tab_y, clip_width+1, tab_height );
+
+        // Tab body; the active tab hides the base line beneath it
+        dc.SetPen( wxPen(DarkModeBorder()) );
+        dc.SetBrush( wxBrush(page.active ? DarkModeTabActive() : DarkModeBg()) );
+        dc.DrawRectangle( tab_x, tab_y, tab_width+1, tab_height+(page.active?1:0) );
+
+        // Close button
+        int close_button_width = 0;
+        if( close_button_state != wxAUI_BUTTON_STATE_HIDDEN )
+        {
+            bool hot = (close_button_state==wxAUI_BUTTON_STATE_HOVER || close_button_state==wxAUI_BUTTON_STATE_PRESSED);
+            wxBitmap bmp = (hot ? m_activeCloseBmp : m_disabledCloseBmp).GetBitmapFor(wnd);
+            wxRect rect( tab_x + tab_width - bmp.GetLogicalWidth() - wnd->FromDIP(1),
+                         tab_y + (tab_height - bmp.GetLogicalHeight())/2,
+                         bmp.GetLogicalWidth(), bmp.GetLogicalHeight() );
+            if( hot )
+            {
+                dc.SetPen( *wxTRANSPARENT_PEN );
+                dc.SetBrush( wxBrush(DarkModeSelectBg()) );
+                dc.DrawRectangle( rect );
+            }
+            dc.DrawBitmap( bmp, rect.x, rect.y, true );
+            *out_button_rect = rect;
+            close_button_width = bmp.GetLogicalWidth();
+        }
+
+        // Caption
+        dc.SetFont( page.active ? m_selectedFont : m_normalFont );
+        dc.SetTextForeground( page.active ? DarkModeFg() : DarkModeFgDim() );
+        int text_x = tab_x + wnd->FromDIP(8);
+        int text_w = 0, text_h = 0;
+        dc.GetTextExtent( page.caption.empty() ? wxString("Xj") : page.caption, &text_w, &text_h );
+        dc.SetClippingRegion( tab_x, tab_y, wxMax(0,wxMin(clip_width,tab_width-close_button_width)), tab_height );
+        dc.DrawText( page.caption, text_x, tab_y + (tab_height-text_h)/2 );
+
+        *out_tab_rect = wxRect( tab_x, tab_y, tab_width, tab_height );
+        dc.DestroyClippingRegion();
+    }
+};
+
+wxAuiTabArt *DarkModeNewTabArt()
+{
+    return new DarkModeTabArt;
+}
+
+void DarkModeAuiManager( wxAuiManager &mgr )
+{
+    wxAuiDockArt *art = mgr.GetArtProvider();
+    if( art )
+    {
+        art->SetColour( wxAUI_DOCKART_BACKGROUND_COLOUR, DarkModeBg() );
+        art->SetColour( wxAUI_DOCKART_SASH_COLOUR,       DarkModeBg() );
+        art->SetColour( wxAUI_DOCKART_BORDER_COLOUR,     DarkModeBorder() );
+        art->SetColour( wxAUI_DOCKART_GRIPPER_COLOUR,    DarkModeBg() );
+    }
+}
+
+#ifdef THC_WINDOWS
+// Dark menu bar. Windows has no API for this, but a themed window gets the undocumented
+//  WM_UAHDRAWMENU / WM_UAHDRAWMENUITEM messages, which let us paint the bar ourselves
+#define WM_UAHDRAWMENU      0x0091
+#define WM_UAHDRAWMENUITEM  0x0092
+struct UAHMENU { HMENU hmenu; HDC hdc; DWORD dwFlags; };
+union  UAHMENUITEMMETRICS { struct { DWORD cx; DWORD cy; } rgsizeBar[2]; struct { DWORD cx; DWORD cy; } rgsizePopup[4]; };
+struct UAHMENUPOPUPMETRICS { DWORD rgcx[4]; DWORD fUpdateMaxWidths : 2; };
+struct UAHMENUITEM { int iPosition; UAHMENUITEMMETRICS umim; UAHMENUPOPUPMETRICS umpm; };
+struct UAHDRAWMENUITEM { DRAWITEMSTRUCT dis; UAHMENU um; UAHMENUITEM umi; };
+
+static bool DarkModeMenuBarProc( HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam, LRESULT &result )
+{
+    static HBRUSH bar_brush   = CreateSolidBrush( RGB(DarkModeMenuBar().Red(),  DarkModeMenuBar().Green(),  DarkModeMenuBar().Blue()) );
+    static HBRUSH hot_brush   = CreateSolidBrush( RGB(DarkModeSelectBg().Red(), DarkModeSelectBg().Green(), DarkModeSelectBg().Blue()) );
+    switch( msg )
+    {
+        case WM_UAHDRAWMENU:
+        {
+            UAHMENU *udm = (UAHMENU *)lparam;
+            MENUBARINFO mbi = { sizeof(mbi) };
+            if( !GetMenuBarInfo(hwnd,OBJID_MENU,0,&mbi) )
+                return false;
+            RECT rc_window;
+            GetWindowRect( hwnd, &rc_window );
+            RECT rc = mbi.rcBar;
+            OffsetRect( &rc, -rc_window.left, -rc_window.top );
+            rc.top -= 1;
+            FillRect( udm->hdc, &rc, bar_brush );
+            result = TRUE;
+            return true;
+        }
+        case WM_UAHDRAWMENUITEM:
+        {
+            UAHDRAWMENUITEM *udmi = (UAHDRAWMENUITEM *)lparam;
+            wchar_t txt[256] = {0};
+            MENUITEMINFOW mii = { sizeof(mii), MIIM_STRING };
+            mii.dwTypeData = txt;
+            mii.cch = 255;
+            GetMenuItemInfoW( udmi->um.hmenu, udmi->umi.iPosition, TRUE, &mii );
+            UINT state = udmi->dis.itemState;
+            bool hot      = (state & (ODS_HOTLIGHT|ODS_SELECTED)) != 0;
+            bool disabled = (state & (ODS_GRAYED|ODS_DISABLED)) != 0;
+            FillRect( udmi->um.hdc, &udmi->dis.rcItem, hot ? hot_brush : bar_brush );
+            wxColour fg = disabled ? DarkModeFgDim() : DarkModeFg();
+            SetTextColor( udmi->um.hdc, RGB(fg.Red(),fg.Green(),fg.Blue()) );
+            SetBkMode( udmi->um.hdc, TRANSPARENT );
+            UINT flags = DT_CENTER | DT_SINGLELINE | DT_VCENTER;
+            if( state & ODS_NOACCEL )
+                flags |= DT_HIDEPREFIX;
+            DrawTextW( udmi->um.hdc, txt, -1, &udmi->dis.rcItem, flags );
+            result = TRUE;
+            return true;
+        }
+        case WM_NCPAINT:
+        case WM_NCACTIVATE:
+        {
+            // Default processing, then paint over the one pixel light line Windows draws under the menu bar
+            result = DefWindowProcW( hwnd, msg, wparam, lparam );
+            MENUBARINFO mbi = { sizeof(mbi) };
+            if( GetMenuBarInfo(hwnd,OBJID_MENU,0,&mbi) )
+            {
+                RECT rc_client;
+                GetClientRect( hwnd, &rc_client );
+                MapWindowPoints( hwnd, NULL, (POINT *)&rc_client, 2 );
+                RECT rc_window;
+                GetWindowRect( hwnd, &rc_window );
+                OffsetRect( &rc_client, -rc_window.left, -rc_window.top );
+                RECT line = rc_client;
+                line.bottom = line.top;
+                line.top--;
+                HDC hdc = GetWindowDC( hwnd );
+                FillRect( hdc, &line, bar_brush );
+                ReleaseDC( hwnd, hdc );
+            }
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
 class ChessApp: public wxApp
 {
 public:
     virtual bool OnInit();
     virtual int  OnExit();
+
+    // Permanent dark mode. Every top level window (frame, dialog) is themed as it is shown,
+    //  and any window created later that slipped through is themed when it first paints
+    virtual int FilterEvent( wxEvent &event )
+    {
+        wxEventType type = event.GetEventType();
+        if( type == wxEVT_SHOW )
+        {
+            wxWindow *win = wxDynamicCast(event.GetEventObject(),wxWindow);
+            if( win && win->IsTopLevel() && static_cast<wxShowEvent&>(event).IsShown() )
+                DarkModeApply( win, true );
+        }
+        else if( type == wxEVT_PAINT || type == wxEVT_ERASE_BACKGROUND )
+        {
+            wxWindow *win = wxDynamicCast(event.GetEventObject(),wxWindow);
+            if( win && !win->UseBgCol() )
+                DarkModeApply( win, false );
+        }
+        else if( type == wxEVT_SYS_COLOUR_CHANGED )
+        {
+            // wxRichTextCtrl reverts to white system colours on this event, don't let it
+            if( wxDynamicCast(event.GetEventObject(),wxRichTextCtrl) )
+                return Event_Processed;
+        }
+        return wxApp::FilterEvent(event);
+    }
 private:
     wxSingleInstanceChecker m_one;
     InterProcessCommunicationServer *m_server=NULL;
@@ -504,6 +853,7 @@ PanelNotebook::PanelNotebook
 
 #else
     notebook = new wxNotebook(this, wxID_ANY, wxPoint(5,0), wxSize(siz.x-book_moves_width-10-new_tab_button_width-10,siz.y*5) );
+    notebook->SetArtProvider( DarkModeNewTabArt() );
 #endif
     NotebookPage *notebook_page1 = new NotebookPage(notebook, wxID_ANY, wxDefaultPosition, wxDefaultSize );
     notebook->AddPage(notebook_page1,"New Game",true);
@@ -861,6 +1211,16 @@ public:
         void OnUpdateEditPromoteRestToVariation( wxUpdateUIEvent &);
 
 
+#ifdef THC_WINDOWS
+    virtual WXLRESULT MSWWindowProc( WXUINT msg, WXWPARAM wparam, WXLPARAM lparam ) wxOVERRIDE
+    {
+        LRESULT result = 0;
+        if( DarkModeMenuBarProc( (HWND)GetHWND(), msg, wparam, lparam, result ) )
+            return result;
+        return wxFrame::MSWWindowProc( msg, wparam, lparam );
+    }
+#endif
+
     DECLARE_EVENT_TABLE()
 private:
     PanelContext *context;
@@ -921,6 +1281,9 @@ bool ChessApp::OnInit()
 
     //_CrtSetBreakAlloc(1050656);
     srand(time(NULL));
+    #ifdef THC_WINDOWS
+    DarkModeWindowsInit();  // must precede creation of any windows
+    #endif
     //_CrtSetBreakAlloc( 198300 ); //563242 );
     //_CrtSetBreakAlloc( 195274 );
     //_CrtSetBreakAlloc( 21007 );
@@ -1387,7 +1750,7 @@ ChessFrame::ChessFrame(const wxString& title, const wxPoint& pos, const wxSize& 
 #ifdef THC_WINDOWS
     wxToolBar *toolbar = new wxToolBar(this, wxID_ANY,
                                wxDefaultPosition, wxDefaultSize,
-                               wxTB_HORIZONTAL|wxNO_BORDER);
+                               wxTB_HORIZONTAL|wxNO_BORDER|wxTB_NODIVIDER);  // divider is a light line, bad in dark mode
 #else
     wxToolBar *toolbar = CreateToolBar(); //new wxToolBar(this, wxID_ANY,
                                //wxDefaultPosition, wxDefaultSize,

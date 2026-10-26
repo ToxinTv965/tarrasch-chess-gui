@@ -11,6 +11,7 @@
 #include "DebugPrintf.h"
 #include "Objects.h"
 #include "PopupControl.h"
+#include "DarkMode.h"
 using namespace std;
 using namespace thc;
 
@@ -165,8 +166,12 @@ void PopupControl::OnPaint( wxPaintEvent& WXUNUSED(event) )
     wxString s;
     int y=0; //, height;
     dc.SetFont(*wxNORMAL_FONT);
-    dc.SetBrush(*wxWHITE_BRUSH);
-    dc.SetPen(*wxLIGHT_GREY_PEN);
+    wxBrush normal_brush(DarkModeInputBg());
+    wxBrush select_brush(DarkModeSelectBg());
+    wxBrush book_brush(DarkModeBookBg());
+    dc.SetBrush(normal_brush);
+    dc.SetPen(wxPen(DarkModeBorder()));
+    dc.SetTextForeground(DarkModeFg());
     //s = strs[0];
     //dc.GetTextExtent(s, &w, &height);
     //height = this->height; //size.y / (count?count:1);
@@ -182,17 +187,17 @@ void PopupControl::OnPaint( wxPaintEvent& WXUNUSED(event) )
         s = strs[idx];
         if( idx == sel )
         {
-            dc.SetBrush(*wxLIGHT_GREY_BRUSH);
+            dc.SetBrush(select_brush);
             dbg_printf( "LIGHT_GREY_BRUSH\n" );
         }
         else if( book[idx]=="B" && popup_mode!=BOOK_HOVER )
         {
-            dc.SetBrush(*wxGREEN_BRUSH);
+            dc.SetBrush(book_brush);
             dbg_printf( "GREEN_BRUSH\n" );
         }
         else
         {
-            dc.SetBrush(*wxWHITE_BRUSH);
+            dc.SetBrush(normal_brush);
             dbg_printf( "WHITE_BRUSH\n" );
         }
         int X = 0;
